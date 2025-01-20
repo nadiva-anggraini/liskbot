@@ -1,1 +1,2 @@
-# liskbot
+### LISK NETWORK BOT PERSONAL USE
+***Note : ***
