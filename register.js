@@ -348,20 +348,20 @@ async function holdETH(wallet) {
     });
     if (response.data.errors) {
       const errorMessage = response.data.errors[0]?.message || "Unknown error";
-      console.error(kleur.red(`Hold USDT Task failed for ${wallet.address}: ${errorMessage}`));
+      console.error(kleur.red(`Hold ETH Task failed for ${wallet.address}: ${errorMessage}`));
       return {
         success: false,
         message: errorMessage,
       };
     }
-    console.log(kleur.green(`Hold USDT Task successful for ${wallet.address}`));
+    console.log(kleur.green(`Hold ETH Task successful for ${wallet.address}`));
     return {
       success: true,
       data: response.data,
     };
   } catch (error) {
     console.error(
-      kleur.yellow(`Hold USDT failed for ${wallet.address}: `),
+      kleur.yellow(`Hold ETH failed for ${wallet.address}: `),
       error.message
     );
     throw error;
@@ -392,20 +392,20 @@ async function holdLSK(wallet) {
     });
     if (response.data.errors) {
       const errorMessage = response.data.errors[0]?.message || "Unknown error";
-      console.error(kleur.red(`Hold USDT Task failed for ${wallet.address}: ${errorMessage}`));
+      console.error(kleur.red(`Hold LSK Task failed for ${wallet.address}: ${errorMessage}`));
       return {
         success: false,
         message: errorMessage,
       };
     }
-    console.log(kleur.green(`Hold USDT Task successful for ${wallet.address}`));
+    console.log(kleur.green(`Hold LSK( Task successful for ${wallet.address}`));
     return {
       success: true,
       data: response.data,
     };
   } catch (error) {
     console.error(
-      kleur.yellow(`Hold USDT failed for ${wallet.address}: `),
+      kleur.yellow(`Hold LSK( failed for ${wallet.address}: `),
       error.message
     );
     throw error;
@@ -436,20 +436,20 @@ async function holdUSDC(wallet) {
     });
     if (response.data.errors) {
       const errorMessage = response.data.errors[0]?.message || "Unknown error";
-      console.error(kleur.red(`Hold USDT Task failed for ${wallet.address}: ${errorMessage}`));
+      console.error(kleur.red(`Hold USDC Task failed for ${wallet.address}: ${errorMessage}`));
       return {
         success: false,
         message: errorMessage,
       };
     }
-    console.log(kleur.green(`Hold USDT Task successful for ${wallet.address}`));
+    console.log(kleur.green(`Hold USDC Task successful for ${wallet.address}`));
     return {
       success: true,
       data: response.data,
     };
   } catch (error) {
     console.error(
-      kleur.yellow(`Hold USDT failed for ${wallet.address}: `),
+      kleur.yellow(`Hold USDC failed for ${wallet.address}: `),
       error.message
     );
     throw error;
