@@ -132,12 +132,12 @@ async function fetchUserData(wallet) {
 		  await loading(`Checkin Task...`, 2000);
 		  await performCheckin(wallet);
 		  await loading(`Swap Task...`, 2000);
-		  await executeTrade(key, apiEndpoint, payload, transactionNumber);
+		  await executeTrade(key, apiEndpoint, payload);
           console.log('All Done');
           break;
 
         case "IS_GUILD_VERIFIED":
-          console.error(kleur.red(`User is not register yet for ${wallet.address}. Please run register.js`));
+          console.error(kleur.red(`User is not register yet for ${wallet.address}. Please run register.js));
           return;
           break;
 
@@ -160,12 +160,11 @@ async function fetchUserData(wallet) {
   }
 }
 
-async function executeTrade(key, apiEndpoint, payload, transactionNumber) {
-    const wallet = new ethers.Wallet(key, provider);
+async function executeTrade(key, apiEndpoint, payload) {
     const account = await wallet.getAddress();
     payload.account = account;
 
-    console.log(`Wallet Address: ${account} | Transaction: ${transactionNumber}`);
+    console.log(`Wallet Address: ${account}`);
     try {
         const response = await axios.post(apiEndpoint, payload);
         const { trade } = response.data.coupon.raw.executionInformation;
@@ -184,7 +183,7 @@ async function executeTrade(key, apiEndpoint, payload, transactionNumber) {
 
         console.log(kleur.blue(`Transaction Confirmed: ${explorer.tx(receipt.hash)}`));
     } catch (error) {
-        console.error(`Error executing trade for transaction ${transactionNumber}:`, error);
+        console.error(`Error executing trade for transaction`, error);
     }
 }
 
@@ -203,7 +202,7 @@ async function dailyCheckin() {
   for (const key of PRIVATE_KEYS) {
     const wallet = new ethers.Wallet(key, provider);
     try {
-	  await loading(`Fetching User Data`, 6000);
+	  await loading(`Fetching User Data`, 2000);
       const fetchData = await fetchUserData(wallet);
 	  console.log('')
     } catch (error) {
