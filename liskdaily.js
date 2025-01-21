@@ -5,6 +5,7 @@ const chains = require('./chains');
 const fs = require('fs');
 const provider = chains.mainnet.lisk.provider;
 const delay = chains.utils.etc.delay;
+const loading = chains.utils.etc.loadingAnimation;
 const header = chains.utils.etc.header;
 const PRIVATE_KEYS = JSON.parse(fs.readFileSync('privateKeys.json', 'utf-8'));
 const { CronJob } = require('cron');
@@ -44,7 +45,7 @@ async function performCheckin(wallet) {
   }
 }
 
-async function fetchAdditionalData(wallet) {
+async function fetchUserData(wallet) {
   try {
     const response = await axios.post("https://portal-api.lisk.com/graphql", {
       query: `
@@ -119,30 +120,91 @@ async function fetchAdditionalData(wallet) {
         },
       },
     });
-
     const userData = response.data?.data?.userdrop?.user;
+
     if (userData) {
-      console.log(kleur.blue(`Rank: ${userData.rank} | Points: ${userData.points} | Status Account: ${userData.verifiedStatus} for ${wallet.address}`));
+      console.log(kleur.green(`Fetched User Data for ${wallet.address}`));
+      console.log(kleur.blue(`Verified Status: ${userData.verifiedStatus}`));
+
+      switch (userData.verifiedStatus) {
+        case "IS_FULLY_VERIFIED":
+          console.log(kleur.green("User is fully verified. Continuing process..."));
+		  await loading(`Checkin Task...`, 2000);
+		  await performCheckin(wallet);
+		  await loading(`Swap Task...`, 2000);
+		  await executeTrade(key, apiEndpoint, payload, transactionNumber);
+          console.log('All Done');
+          break;
+
+        case "IS_GUILD_VERIFIED":
+          console.error(kleur.red(`User is not register yet for ${wallet.address}. Please run register.js));
+          return;
+          break;
+
+        case "NOT_VERIFIED":
+          console.error(kleur.red(`User is not verified for ${wallet.address}. Please verify first at https://guild.xyz/lisk`));
+          return;
+          break;
+
+        default:
+          console.error(kleur.red(`Unknown verified status: ${userData.verifiedStatus} for ${wallet.address}`));
+          return;
+      }
     } else {
-      console.log(kleur.yellow(`No user data returned for ${wallet.address}`));
+      console.error(kleur.yellow(`No user data found for ${wallet.address}`));
+      return;
     }
-    return response.data;
   } catch (error) {
-    console.error(
-      kleur.yellow(`Failed to fetch additional data for ${wallet.address}: `),
-      error.message
-    );
-    throw error;
+    console.error(kleur.red(`Error fetching user data for ${wallet.address}:`), error.message);
+    return;
   }
 }
+
+async function executeTrade(key, apiEndpoint, payload, transactionNumber) {
+    const wallet = new ethers.Wallet(key, provider);
+    const account = await wallet.getAddress();
+    payload.account = account;
+
+    console.log(`Wallet Address: ${account} | Transaction: ${transactionNumber}`);
+    try {
+        const response = await axios.post(apiEndpoint, payload);
+        const { trade } = response.data.coupon.raw.executionInformation;
+        const gasFee = response.data.fees.gas;
+        const value = trade.value === '0x00' ? 0 : ethers.parseUnits(trade.value, 18);
+
+        const tx = {
+            to: trade.to,
+            data: trade.data,
+            value: value,
+            gasLimit: gasFee,
+        };
+
+        const txResponse = await wallet.sendTransaction(tx);
+        const receipt = await txResponse.wait();
+
+        console.log(kleur.blue(`Transaction Confirmed: ${explorer.tx(receipt.hash)}`));
+    } catch (error) {
+        console.error(`Error executing trade for transaction ${transactionNumber}:`, error);
+    }
+}
+
+const apiEndpoint = "https://canoe.v2.icarus.tools/market/usor/swap_quote";
+const payload = {
+    chain: "lisk",
+    inTokenAddress: "0x4200000000000000000000000000000000000006",
+    outTokenAddress: "0xac485391EB2d7D88253a7F1eF18C37f4242D1A24",
+    isExactIn: true,
+    slippage: 50,
+    inTokenAmount: "0.000001",
+};
 
 async function dailyCheckin() {
   header();
   for (const key of PRIVATE_KEYS) {
     const wallet = new ethers.Wallet(key, provider);
     try {
-      const checkinResult = await performCheckin(wallet);
-      const additionalData = await fetchAdditionalData(wallet);
+	  await loading(`Fetching User Data`, 6000);
+      const fetchData = await fetchUserData(wallet);
 	  console.log('')
     } catch (error) {
       console.error(kleur.red(`Error processing wallet ${wallet.address}: ${error.message}`));
