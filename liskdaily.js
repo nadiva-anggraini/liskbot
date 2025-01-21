@@ -137,7 +137,7 @@ async function fetchUserData(wallet) {
           break;
 
         case "IS_GUILD_VERIFIED":
-          console.error(kleur.red(`User is not register yet for ${wallet.address}. Please run register.js));
+          console.error(kleur.red(`User is not register yet for ${wallet.address}. Please run register.js`));
           return;
           break;
 
