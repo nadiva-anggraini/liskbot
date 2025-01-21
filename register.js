@@ -190,26 +190,26 @@ async function fetchAirdropUser(wallet) {
           break;
 
         case "IS_GUILD_VERIFIED":
-          await loading(`User is guild verified, Regiter user to Airdrop`, 6000);
+          await loading(`User is guild verified, Register user to Airdrop`, 6000);
           await addAirdropUser(wallet, referralCode);
           break;
 
         case "NOT_VERIFIED":
-          console.error(kleur.red("User is not verified. Please verify first at https://guild.xyz/lisk"));
-          process.exit(1);
+          console.error(kleur.red(`User is not verified for ${wallet.address}. Please verify first at https://guild.xyz/lisk`));
+          return; // Keluar dari fungsi tetapi lanjutkan ke iterasi berikutnya
           break;
 
         default:
-          console.error(kleur.red(`Unknown verified status: ${userData.verifiedStatus}`));
-          process.exit(1);
+          console.error(kleur.red(`Unknown verified status: ${userData.verifiedStatus} for ${wallet.address}`));
+          return; // Tidak melanjutkan proses untuk wallet ini
       }
     } else {
       console.error(kleur.yellow(`No user data found for ${wallet.address}`));
-      process.exit(1);
+      return; // Keluar dari fungsi tetapi lanjutkan ke iterasi berikutnya
     }
   } catch (error) {
     console.error(kleur.red(`Error fetching user data for ${wallet.address}:`), error.message);
-    process.exit(1);
+    return; // Keluar dari fungsi tetapi lanjutkan ke iterasi berikutnya
   }
 }
 
