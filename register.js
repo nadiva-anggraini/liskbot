@@ -187,40 +187,40 @@ async function fetchAirdropUser(wallet) {
       switch (userData.verifiedStatus) {
         case "IS_FULLY_VERIFIED":
           console.log(kleur.green("User is fully verified. Continuing process..."));
-		  await loading(`Checkin Task...`, 2000);
-		  const fistCheckin = await performCheckin(wallet);
-	      await loading(`Follow Task...`, 2000);
-          const followMissin = await followTask(wallet);
-	      await loading(`Hold ETH Task...`, 2000);
-	      const ethMission = await holdETH(wallet);
-	      await loading(`Hold LSK Task...`, 2000);
-	      const lskMission = await holdLSK(wallet);
-	      await loading(`Hold USDC Task...`, 2000);
-	      const usdcMission = await holdUSDC(wallet);
-	      await loading(`Hold USDT Task...`, 2000);
-	      const usdtMission = await holdUSDT(wallet);
-	      await loading(`Checking User data...`, 2000);
-	      const dataAccount = await checkAccount(wallet);
+	  await loading(`Checkin Task...`, 2000);
+	  await performCheckin(wallet);
+	  await loading(`Follow Task...`, 2000);
+          await followTask(wallet);
+	  await loading(`Hold ETH Task...`, 2000);
+	  await holdETH(wallet);
+  	  await loading(`Hold LSK Task...`, 2000);
+	  await holdLSK(wallet);
+	  await loading(`Hold USDC Task...`, 2000);
+	  await holdUSDC(wallet);
+	  await loading(`Hold USDT Task...`, 2000);
+	  await holdUSDT(wallet);
+	  await loading(`Checking User data...`, 2000);
+	  await checkAccount(wallet);
           console.log('All Done');
           break;
 
         case "IS_GUILD_VERIFIED":
-          await loading(`User is guild verified, Register user to Airdrop`, 6000);
+          await loading(`User is guild verified, Register user to Airdrop`, 4000);
           await addAirdropUser(wallet, referralCode);
-		  await loading(`Checkin Task...`, 2000);
-		  const fistCheckin = await performCheckin(wallet);
-	      await loading(`Follow Task...`, 2000);
-          const followMissin = await followTask(wallet);
-	      await loading(`Hold ETH Task...`, 2000);
-	      const ethMission = await holdETH(wallet);
-	      await loading(`Hold LSK Task...`, 2000);
-	      const lskMission = await holdLSK(wallet);
-	      await loading(`Hold USDC Task...`, 2000);
-	      const usdcMission = await holdUSDC(wallet);
-	      await loading(`Hold USDT Task...`, 2000);
-	      const usdtMission = await holdUSDT(wallet);
-	      await loading(`Checking User data...`, 2000);
-	      const dataAccount = await checkAccount(wallet);
+	  await loading(`Checkin Task...`, 2000);
+	  await performCheckin(wallet);
+	  await loading(`Follow Task...`, 2000);
+          await followTask(wallet);
+	  await loading(`Hold ETH Task...`, 2000);
+	  await holdETH(wallet);
+  	  await loading(`Hold LSK Task...`, 2000);
+	  await holdLSK(wallet);
+	  await loading(`Hold USDC Task...`, 2000);
+	  await holdUSDC(wallet);
+	  await loading(`Hold USDT Task...`, 2000);
+	  await holdUSDT(wallet);
+	  await loading(`Checking User data...`, 2000);
+	  await checkAccount(wallet);
           console.log('All Done');
           break;
 
@@ -556,7 +556,7 @@ async function runRegister() {
   for (const key of PRIVATE_KEYS) {
     const wallet = new ethers.Wallet(key, provider);
     try {
-	  await loading(`Fetching User Data`, 6000);
+      await loading(`Fetching User Data`, 4000);
       const fetchUser = await fetchAirdropUser(wallet);
       console.log('');
     } catch (error) {
