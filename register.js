@@ -188,19 +188,19 @@ async function fetchAirdropUser(wallet) {
         case "IS_FULLY_VERIFIED":
           console.log(kleur.green("User is fully verified. Continuing process..."));
 	  await loading(`Checkin Task...`, 2000);
-	  const fistCheckin = await performCheckin(wallet);
+	  const Checkin = await performCheckin(wallet);
 	  await loading(`Follow Task...`, 2000);
-          const followMissin = await followTask(wallet);
+          await followTask(wallet);
 	  await loading(`Hold ETH Task...`, 2000);
-	  const ethMission = await holdETH(wallet);
+	  await holdETH(wallet);
 	  await loading(`Hold LSK Task...`, 2000);
-	  const lskMission = await holdLSK(wallet);
+	  await holdLSK(wallet);
 	  await loading(`Hold USDC Task...`, 2000);
-	  const usdcMission = await holdUSDC(wallet);
+	  await holdUSDC(wallet);
 	  await loading(`Hold USDT Task...`, 2000);
-	  const usdtMission = await holdUSDT(wallet);
+	  await holdUSDT(wallet);
 	  await loading(`Checking User data...`, 2000);
-	  const dataAccount = await checkAccount(wallet);
+	  await checkAccount(wallet);
           console.log('All Done');
           break;
 
@@ -208,19 +208,19 @@ async function fetchAirdropUser(wallet) {
           await loading(`User is guild verified, Register user to Airdrop`, 6000);
           await addAirdropUser(wallet, referralCode);
 	  await loading(`Checkin Task...`, 2000);
-	  const fistCheckin = await performCheckin(wallet);
+	  await performCheckin(wallet);
 	  await loading(`Follow Task...`, 2000);
-          const followMissin = await followTask(wallet);
+          await followTask(wallet);
 	  await loading(`Hold ETH Task...`, 2000);
-	  const ethMission = await holdETH(wallet);
+	  await holdETH(wallet);
 	  await loading(`Hold LSK Task...`, 2000);
-	  const lskMission = await holdLSK(wallet);
+	  await holdLSK(wallet);
 	  await loading(`Hold USDC Task...`, 2000);
-	  const usdcMission = await holdUSDC(wallet);
+	  await holdUSDC(wallet);
 	  await loading(`Hold USDT Task...`, 2000);
-	  const usdtMission = await holdUSDT(wallet);
+	  await holdUSDT(wallet);
 	  await loading(`Checking User data...`, 2000);
-	  const dataAccount = await checkAccount(wallet);
+	  await checkAccount(wallet);
           console.log('All Done');
           break;
 
