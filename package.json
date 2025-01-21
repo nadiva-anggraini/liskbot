@@ -17,6 +17,7 @@
     "ethers": "^6.13.1",
     "moment": "^2.30.1",
     "kleur": "^4.1.5",
+    "moment-timezone": "^0.5.46",
     "readline-sync": "^1.4.10"
   }
 }
