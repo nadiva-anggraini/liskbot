@@ -15,17 +15,15 @@ const SPENDER_CA = '0xB952578f3520EE8Ea45b7914994dcf4702cEe578';
 
 async function doApprove (privateKey) {
 	try {
-		const wallet = new ethers.Wallet(privateKey, provider);
-		const approveToken = new ethers.Contract(WETH_CA, WETH_ABI, wallet);
-		const amount =  '1461501637330902918203684832716283019655932542975';
-		const txApprove = await approveToken.approve(SPENDER_CA, amount);
-		const receiptApprove = await txApprove.wait(1);
-		return receiptApprove;
+	 const wallet = new ethers.Wallet(privateKey, provider);
+	 const approveToken = new ethers.Contract(WETH_CA, WETH_ABI, wallet);
+	 console.log(`[${moment().format('HH:mm:ss')}] Wallet Address: ${wallet.address}`
+	 const amount =  '1461501637330902918203684832716283019655932542975';
+	 const txApprove = await approveToken.approve(SPENDER_CA, amount);
+	 const receiptApprove = await txApprove.wait(1);
+	 return receiptApprove;
 	} catch (error) {
-		console.log(
-        `[${moment().format('HH:mm:ss')}] Error executing transaction: ${
-          error.message
-        }`.red
+		console.log(`[${moment().format('HH:mm:ss')}] Error executing transaction: ${error.message}`.red
       );
 	}
 }
