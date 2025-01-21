@@ -187,29 +187,59 @@ async function fetchAirdropUser(wallet) {
       switch (userData.verifiedStatus) {
         case "IS_FULLY_VERIFIED":
           console.log(kleur.green("User is fully verified. Continuing process..."));
+		  await loading(`Checkin Task...`, 2000);
+		  const fistCheckin = await performCheckin(wallet);
+	      await loading(`Follow Task...`, 2000);
+          const followMissin = await followTask(wallet);
+	      await loading(`Hold ETH Task...`, 2000);
+	      const ethMission = await holdETH(wallet);
+	      await loading(`Hold LSK Task...`, 2000);
+	      const lskMission = await holdLSK(wallet);
+	      await loading(`Hold USDC Task...`, 2000);
+	      const usdcMission = await holdUSDC(wallet);
+	      await loading(`Hold USDT Task...`, 2000);
+	      const usdtMission = await holdUSDT(wallet);
+	      await loading(`Checking User data...`, 2000);
+	      const dataAccount = await checkAccount(wallet);
+          console.log('All Done');
           break;
 
         case "IS_GUILD_VERIFIED":
           await loading(`User is guild verified, Register user to Airdrop`, 6000);
           await addAirdropUser(wallet, referralCode);
+		  await loading(`Checkin Task...`, 2000);
+		  const fistCheckin = await performCheckin(wallet);
+	      await loading(`Follow Task...`, 2000);
+          const followMissin = await followTask(wallet);
+	      await loading(`Hold ETH Task...`, 2000);
+	      const ethMission = await holdETH(wallet);
+	      await loading(`Hold LSK Task...`, 2000);
+	      const lskMission = await holdLSK(wallet);
+	      await loading(`Hold USDC Task...`, 2000);
+	      const usdcMission = await holdUSDC(wallet);
+	      await loading(`Hold USDT Task...`, 2000);
+	      const usdtMission = await holdUSDT(wallet);
+	      await loading(`Checking User data...`, 2000);
+	      const dataAccount = await checkAccount(wallet);
+          console.log('All Done');
           break;
 
         case "NOT_VERIFIED":
           console.error(kleur.red(`User is not verified for ${wallet.address}. Please verify first at https://guild.xyz/lisk`));
-          return; // Keluar dari fungsi tetapi lanjutkan ke iterasi berikutnya
+          return;
           break;
 
         default:
           console.error(kleur.red(`Unknown verified status: ${userData.verifiedStatus} for ${wallet.address}`));
-          return; // Tidak melanjutkan proses untuk wallet ini
+          return;
       }
     } else {
       console.error(kleur.yellow(`No user data found for ${wallet.address}`));
-      return; // Keluar dari fungsi tetapi lanjutkan ke iterasi berikutnya
+      return;
     }
   } catch (error) {
     console.error(kleur.red(`Error fetching user data for ${wallet.address}:`), error.message);
-    return; // Keluar dari fungsi tetapi lanjutkan ke iterasi berikutnya
+    return;
   }
 }
 
@@ -506,21 +536,6 @@ async function runRegister() {
     try {
 	  await loading(`Fetching User Data`, 6000);
       const fetchUser = await fetchAirdropUser(wallet);
-	  await loading(`Checkin Task...`, 2000);
-      const fistCheckin = await performCheckin(wallet);
-	  await loading(`Follow Task...`, 2000);
-      const followMissin = await followTask(wallet);
-	  await loading(`Hold ETH Task...`, 2000);
-	  const ethMission = await holdETH(wallet);
-	  await loading(`Hold LSK Task...`, 2000);
-	  const lskMission = await holdLSK(wallet);
-	  await loading(`Hold USDC Task...`, 2000);
-	  const usdcMission = await holdUSDC(wallet);
-	  await loading(`Hold USDT Task...`, 2000);
-	  const usdtMission = await holdUSDT(wallet);
-	  await loading(`Checking User data...`, 2000);
-	  const dataAccount = await checkAccount(wallet);
-      console.log('All Done');
       console.log('');
     } catch (error) {
       console.error(kleur.red(`Error processing wallet ${wallet.address}: ${error.message}`));
