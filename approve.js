@@ -17,7 +17,7 @@ async function doApprove (privateKey) {
 	try {
 	 const wallet = new ethers.Wallet(privateKey, provider);
 	 const approveToken = new ethers.Contract(WETH_CA, WETH_ABI, wallet);
-	 console.log(`[${moment().format('HH:mm:ss')}] Wallet Address: ${wallet.address}`
+	 console.log(`[${moment().format('HH:mm:ss')}] Wallet Address: ${wallet.address}`);
 	 const amount =  '1461501637330902918203684832716283019655932542975';
 	 const txApprove = await approveToken.approve(SPENDER_CA, amount);
 	 const receiptApprove = await txApprove.wait(1);
