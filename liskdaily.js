@@ -131,12 +131,14 @@ async function fetchUserData(privateKey, apiEndpoint, payload) {
 
       switch (userData.verifiedStatus) {
         case "IS_FULLY_VERIFIED":
-          console.log(kleur.green("User is fully verified. Continuing process..."));
-	  await loading(`Checkin Task...`, 2000);
-	  const fistCheckin = await performCheckin(privateKey);
-	  await loading(`Swap Task...`, 2000);
-	  await executeTrade(wallet, privateKey, apiEndpoint, payload);
-          break;
+        console.log(kleur.green("User is fully verified. Continuing process..."));
+	await loading(`Checkin Task...`, 2000);
+	const fistCheckin = await performCheckin(privateKey);
+	for (let i = 0; i < 3; i++) {
+        console.log(kleur.yellow(`Executing trade ${i + 1} of 3`));
+        await executeTrade(wallet, privateKey, apiEndpoint, payload);
+	}
+	break;
 
         case "IS_GUILD_VERIFIED":
           console.error(kleur.red(`User is not register for ${wallet.address}. Please run register.js`));
@@ -209,4 +211,6 @@ async function dailyCheckin() {
     }
   }
 }
-dailyCheckin()
+const job = new CronJob('5 0 * * *', dailyCheckin, null, true, 'UTC');
+console.log('Transaksi will run every 0:05 UTC');
+job.start();
