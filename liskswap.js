@@ -3,20 +3,142 @@ const axios = require("axios");
 const kleur = require("kleur");
 const chains = require('./chains');
 const fs = require('fs');
-const { CronJob } = require('cron');
-
 const provider = chains.mainnet.lisk.provider();
 const explorer = chains.mainnet.lisk.explorer;
 const delay = chains.utils.etc.delay;
+const loading = chains.utils.etc.loadingAnimation;
 const header = chains.utils.etc.header;
 const PRIVATE_KEYS = JSON.parse(fs.readFileSync('privateKeys.json', 'utf-8'));
+const { CronJob } = require('cron');
 
-async function executeTrade(privateKey, apiEndpoint, payload, transactionNumber) {
-    const wallet = new ethers.Wallet(privateKey, provider);
+async function fetchUserData(privateKey, apiEndpoint, payload) {
+  try {
+	const wallet = new ethers.Wallet(privateKey, provider);
+    const response = await axios.post("https://portal-api.lisk.com/graphql", {
+      query: `
+        query AirdropUser($filter: UserFilter!, $pointsHistoryFilter: QueryFilter, $tasksFilter: QueryFilter) {
+          userdrop {
+            user(filter: $filter) {
+              address
+              referredBy
+              verifiedStatus
+              rank
+              points
+              updatedAt
+              createdAt
+              referrals {
+                totalCount
+                points
+                code
+                rank
+                referralsInfo {
+                  userAddress
+                  createdAt
+                  points
+                }
+              }
+              pointsHistories(filter: $pointsHistoryFilter) {
+                totalCount
+                histories {
+                  id
+                  taskID
+                  taskDescription
+                  points
+                  createdAt
+                }
+              }
+              tasks(filter: $tasksFilter) {
+                id
+                title
+                description
+                tasks {
+                  id
+                  description
+                  type
+                  daysForStreak
+                  createdAt
+                  frequency
+                  points
+                  progress {
+                    id
+                    isCompleted
+                    streakInDays
+                    frequencyCounter
+                    points
+                    completedAt
+                  }
+                  taskMetadata {
+                    link {
+                      url
+                      description
+                    }
+                    icon
+                  }
+                }
+                type
+              }
+            }
+          }
+        }
+      `,
+      variables: {
+        filter: {
+          address: wallet.address,
+        },
+      },
+    });
+    const userData = response.data?.data?.userdrop?.user;
+
+    if (userData) {
+      console.log(kleur.green(`Fetched User Data for ${wallet.address}`));
+      console.log(kleur.blue(`Rank: ${userData.rank} | Points: ${userData.points} | Verified Status: ${userData.verifiedStatus} for ${wallet.address}`));
+
+      switch (userData.verifiedStatus) {
+        case "IS_FULLY_VERIFIED":
+	console.log(kleur.green("User is fully verified. Continuing process..."));
+	await loading(`Trade Task...`, 2000);
+	for (let i = 0; i < 14; i++) {
+        console.log(kleur.yellow(`Executing trade ${i + 1} of 14...`));
+        await executeTrade(wallet, privateKey, apiEndpoint, payload);
+	}
+	break;
+
+        case "IS_GUILD_VERIFIED":
+        console.error(kleur.red(`User is not register for ${wallet.address}. Please run register.js`));
+        return;
+        break;
+
+        case "NOT_VERIFIED":
+        console.error(kleur.red(`User is not verified for ${wallet.address}. Please verify first at https://guild.xyz/lisk`));
+        return;
+        break;
+
+        default:
+        console.error(kleur.red(`Unknown verified status: ${userData.verifiedStatus} for ${wallet.address}`));
+        return;
+      }
+    } else {
+      console.error(kleur.yellow(`No user data found for ${wallet.address}`));
+      return;
+    }
+  } catch (error) {
+    console.error(kleur.red(`Error fetching user data for ${wallet.address}:`), error.message);
+    return;
+  }
+}
+const apiEndpoint = "https://canoe.v2.icarus.tools/market/usor/swap_quote";
+const payload = {
+    chain: "lisk",
+    inTokenAddress: "0x4200000000000000000000000000000000000006",
+    outTokenAddress: "0xac485391EB2d7D88253a7F1eF18C37f4242D1A24",
+    isExactIn: true,
+    slippage: 50,
+    inTokenAmount: "0.000001",
+};
+
+async function executeTrade(wallet, privateKey, apiEndpoint, payload) {
     const account = await wallet.getAddress();
     payload.account = account;
-
-    console.log(`Wallet Address: ${account} | Transaction: ${transactionNumber}`);
     try {
         const response = await axios.post(apiEndpoint, payload);
         const { trade } = response.data.coupon.raw.executionInformation;
@@ -35,31 +157,21 @@ async function executeTrade(privateKey, apiEndpoint, payload, transactionNumber)
 
         console.log(kleur.blue(`Transaction Confirmed: ${explorer.tx(receipt.hash)}`));
     } catch (error) {
-        console.error(`Error executing trade for transaction ${transactionNumber}:`, error);
+        console.error(`Error executing trade for transaction`, error);
     }
 }
 
-const apiEndpoint = "https://canoe.v2.icarus.tools/market/usor/swap_quote";
-const payload = {
-    chain: "lisk",
-    inTokenAddress: "0x4200000000000000000000000000000000000006",
-    outTokenAddress: "0xac485391EB2d7D88253a7F1eF18C37f4242D1A24",
-    isExactIn: true,
-    slippage: 50,
-    inTokenAmount: "0.000001",
-};
 
 async function runTrade() {
-    header();
-    for (const [index, privateKey] of PRIVATE_KEYS.entries()) {
-        console.log(kleur.green(`Starting transactions for Wallet ${index + 1}`));
-        for (let i = 1; i <= 15; i++) {
-            await executeTrade(privateKey, apiEndpoint, payload, i);
-            await delay(5000);
-        }
-        console.log(kleur.green(`Completed 15 transactions for Wallet ${index + 1}`));
-		console.log('');
+  header();
+  for (const privateKey of PRIVATE_KEYS) {
+    try {
+      await loading(`Fetch User Data...`, 2000);
+      await fetchUserData(privateKey, apiEndpoint, payload);
+      console.log('')
+    } catch (error) {
+      console.error(kleur.red(`Error processing wallet: ${error.message}`));
     }
+  }
 }
-
-runTrade().catch(error => console.error("Error in runTrade:", error));
+runTrade()
